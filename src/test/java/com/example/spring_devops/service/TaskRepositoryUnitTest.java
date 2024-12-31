@@ -2,9 +2,18 @@ package com.example.spring_devops.service;
 
 import com.example.spring_devops.model.Task;
 import com.example.spring_devops.repository.TaskRepo;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.annotation.Order;
+import org.springframework.test.annotation.Rollback;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +34,7 @@ import java.util.Optional;
             Task task = Task.builder()
                     .description("this is the test for the task ")
                     .name("test task")
-                    .deadline("2024-05-02")
+                    .deadline(LocalDate.parse("2024-05-02"))
                     .build();
 
             taskRepo.save(task);
