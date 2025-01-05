@@ -19,18 +19,18 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.*;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
-import static org.springframework.http.RequestEntity.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import static org.hamcrest.CoreMatchers.is;
+
+
 
 
 @WebMvcTest(TaskController.class)
@@ -68,7 +68,7 @@ public class EmployeeControllerUnitTest {
         given(taskService.createTask(any(Task.class))).willReturn(task);
 
         // action
-        ResultActions response = mockMvc.perform(post("/api/employees")
+        ResultActions response = mockMvc.perform(post("/api/task")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(task)));
 
@@ -107,12 +107,12 @@ public class EmployeeControllerUnitTest {
     //get by Id controller
     @Test
     @Order(3)
-    public void getByIdEmployeeTest() throws Exception{
+    public void getByIdTaskTest() throws Exception{
         // precondition
         given(taskService.getTaskById(task.getId())).willReturn(Optional.of(task));
 
         // action
-        ResultActions response = mockMvc.perform(get("/task/{id}", task.getId()));
+        ResultActions response = mockMvc.perform(get("/api/task/{id}", task.getId()));
 
         // verify
         response.andExpect(status().isOk())
@@ -135,7 +135,7 @@ public class EmployeeControllerUnitTest {
         willDoNothing().given(taskService).deleteTask(task.getId());
 
         // action
-        ResultActions response = mockMvc.perform(delete("/task/{id}", task.getId()));
+        ResultActions response = mockMvc.perform(delete("/api/task/{id}", task.getId()));
 
         // then - verify the output
         response.andExpect(status().isOk())
