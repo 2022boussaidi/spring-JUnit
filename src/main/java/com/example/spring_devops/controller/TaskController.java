@@ -4,6 +4,7 @@ package com.example.spring_devops.controller;
 import com.example.spring_devops.model.Task;
 import com.example.spring_devops.service.TaskService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +13,13 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("task")
+@RequestMapping("/api/task")
 public class TaskController {
     private final TaskService taskService ;
 
     @PostMapping
-    Task newTask(@RequestBody Task newTask){
-        return taskService.createTask(newTask);
+    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+        return new ResponseEntity<>(taskService.createTask(task), HttpStatus.CREATED);
     }
     
     @GetMapping

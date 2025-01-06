@@ -17,8 +17,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-    @DataJpaTest
+    //@DataJpaTest// this @DataJpaTest annotation is making an error still figuring it out
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+
     public class TaskRepositoryUnitTest  {
 
         @Autowired
@@ -32,8 +33,8 @@ import java.util.Optional;
 
             //Action
             Task task = Task.builder()
-                    .description("this is the test for the task ")
-                    .name("test task")
+                    .description("this is the test for the task number we don't know")
+                    .name("test ")
                     .deadline(LocalDate.parse("2024-05-02"))
                     .build();
 

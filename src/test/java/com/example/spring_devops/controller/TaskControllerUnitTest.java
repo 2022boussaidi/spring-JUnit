@@ -4,7 +4,8 @@ package com.example.spring_devops.controller;
 import com.example.spring_devops.model.Task;
 import com.example.spring_devops.service.TaskService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -35,7 +36,7 @@ import static org.hamcrest.CoreMatchers.is;
 
 @WebMvcTest(TaskController.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class EmployeeControllerUnitTest {
+public class TaskControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -49,16 +50,15 @@ public class EmployeeControllerUnitTest {
     Task task;
 
     @BeforeEach
-    public void setup(){
-
+    public void setup() {
         task = Task.builder()
                 .id(1L)
                 .name("task one")
-                .description(" test controller for task one")
+                .description("test controller for task one")
                 .deadline(LocalDate.parse("2024-05-02"))
                 .build();
-
     }
+
 
     //Post Controller
     @Test
@@ -73,14 +73,12 @@ public class EmployeeControllerUnitTest {
                 .content(objectMapper.writeValueAsString(task)));
 
         // verify
-        response.andDo(print()).
-                andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name",
-                        is(task.getName())))
-                .andExpect(jsonPath("$.description",
-                        is(task.getDescription())))
-                .andExpect(jsonPath("$.deadline",
-                        is(task.getDeadline())));
+        response.andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is(task.getName())))
+                .andExpect(jsonPath("$.description", is(task.getDescription())))
+                .andExpect(jsonPath("$.deadline", is(task.getDeadline().toString()))); // Convert LocalDate to String
+
     }
 
     //Get Controller
@@ -104,7 +102,7 @@ public class EmployeeControllerUnitTest {
 
     }
 
-    //get by Id controller
+    //get by  task Id controller
     @Test
     @Order(3)
     public void getByIdTaskTest() throws Exception{
@@ -119,7 +117,7 @@ public class EmployeeControllerUnitTest {
                 .andDo(print())
                 .andExpect(jsonPath("$.name", is(task.getName())))
                 .andExpect(jsonPath("$.description", is(task.getDescription())))
-                .andExpect(jsonPath("$.deadline", is(task.getDeadline())));
+                .andExpect(jsonPath("$.deadline", is(task.getDeadline().toString()))); // Convert LocalDate to String
 
     }
 
@@ -127,7 +125,7 @@ public class EmployeeControllerUnitTest {
 
 
 
-    // delete employee
+    // delete task
     @Test
     @Order(4)
     public void deleteTaskTest() throws Exception{
