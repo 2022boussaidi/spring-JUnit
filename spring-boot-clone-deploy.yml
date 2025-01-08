@@ -1,0 +1,96 @@
+- name: Automate Spring Boot App Deployment with Database Setup
+  hosts: target_server
+  become: yes
+
+  vars:
+    repo_url: "https://github.com/2022boussaidi/spring-JUnit.git"  # Replace with your repo URL
+    branch_name: "master"  # Branch to clone
+    app_name: spring-devops
+    db_name: spring-devops
+    db_user: root
+    db_password: ""
+    db_port: 3308
+    db_host: localhost
+    app_dir: /opt/spring-app
+    build_tool: "mvn"  # Change to "gradle" if using Gradle
+
+  tasks:
+    # Step 1: Install Dependencies
+    - name: Install Java, Git, and MySQL
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - openjdk-11-jdk
+        - mysql-server
+        - git
+
+    # Step 2: Start and Configure MySQL
+    - name: Ensure MySQL is running
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: Install pip
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Install PyMySQL
+      pip:
+        name: pymysql
+        state: present
+
+    - name: Create MySQL Database
+      mysql_db:
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        name: spring-devops
+        state: present
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
+        ansible_mysql_python_module: PyMySQL
+
+    - name: Create MySQL User and Grant Permissions
+      mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        priv: "{{ db_name }}.*:ALL"
+        host: "{{ db_host }}"
+        state: present
+
+    # Step 3: Clone the Spring Boot Repository
+    - name: Clone the application repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: "{{ branch_name }}"
+        force: yes
+
+    # Step 4: Build the Spring Boot Application
+    - name: Build the application with Maven
+      shell: "{{ build_tool }} clean package -DskipTests"
+      args:
+        chdir: "{{ app_dir }}"
+      when: build_tool == "mvn"
+
+
+
+    # Step 5: Run the Spring Boot Application
+    - name: Run Spring Boot Application
+      shell: >
+        nohup java -jar {{ app_dir }}/target/*.jar
+        --spring.datasource.url=jdbc:mysql://{{ db_host }}:{{ db_port }}/{{ db_name }}
+        --spring.datasource.username={{ db_user }}
+        --spring.datasource.password={{ db_password }} &
+      args:
+        chdir: "{{ app_dir }}"
+      async: 0
+      poll: 0
+
+    # Step 6: Verify Application is Running
+    - name: Wait for application to start
+      wait_for:
+        port: 8080
+        state: started
+        timeout: 30
